@@ -1,0 +1,11 @@
+{
+  "name": "@paperlens/db",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "@prisma/client": "^7.0.0",
+    "@prisma/adapter-pg": "^7.0.0",
+    "pg": "^8.16.0"
+  }
+}

@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+}
+model User {
+  id String @id @default(uuid())
+  email String @unique
+  passwordHash String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sessions Session[]
+  projects Project[]
+}
+model Session {
+  id String @id
+  userId String
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+  csrf String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  @@index([userId])
+  @@index([expiresAt])
+}
+model Project {
+  id String @id @default(uuid())
+  userId String
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+  name String
+  description String @default("")
+  deleting Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  papers Paper[]
+  runs AnalysisRun[]
+  conversations Conversation[]
+  @@index([userId,createdAt])
+}
+model Paper {
+  id String @id @default(uuid())
+  projectId String
+  project Project @relation(fields:[projectId],references:[id],onDelete:Cascade)
+  title String
+  hash String
+  storageKey String @unique
+  size Int
+  pageCount Int @default(0)
+  pages Json?
+  status String @default("uploaded")
+  error String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  chunks DocumentChunk[]
+  summaries PaperSummary[]
+  @@unique([projectId,hash])
+  @@index([projectId])
+}
+model DocumentChunk {
+  id String @id
+  paperId String
+  paper Paper @relation(fields:[paperId],references:[id],onDelete:Cascade)
+  ordinal Int
+  page Int
+  section String
+  text String
+  embedding Unsupported("vector(1536)")?
+  evidence Json?
+  configKey String
+  createdAt DateTime @default(now())
+  @@unique([paperId,ordinal,configKey])
+  @@index([paperId,configKey])
+}
+model AnalysisRun {
+  id String @id @default(uuid())
+  projectId String
+  project Project @relation(fields:[projectId],references:[id],onDelete:Cascade)
+  cacheKey String
+  config Json
+  paperIds String[]
+  status String @default("queued")
+  stage String @default("validation")
+  error String?
+  aiCalls Int @default(0)
+  usage Json @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  result ComparisonResult?
+  @@unique([projectId,cacheKey])
+  @@index([status,createdAt])
+}
+model PaperSummary {
+  id String @id @default(uuid())
+  paperId String
+  paper Paper @relation(fields:[paperId],references:[id],onDelete:Cascade)
+  configKey String
+  schemaVersion Int @default(1)
+  output Json
+  createdAt DateTime @default(now())
+  @@unique([paperId,configKey])
+}
+model ComparisonResult {
+  id String @id @default(uuid())
+  runId String @unique
+  run AnalysisRun @relation(fields:[runId],references:[id],onDelete:Cascade)
+  schemaVersion Int @default(1)
+  output Json
+  gaps Json
+  createdAt DateTime @default(now())
+}
+model Conversation {
+  id String @id @default(uuid())
+  projectId String
+  project Project @relation(fields:[projectId],references:[id],onDelete:Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  messages Message[]
+  @@index([projectId])
+}
+model Message {
+  id String @id @default(uuid())
+  conversationId String
+  conversation Conversation @relation(fields:[conversationId],references:[id],onDelete:Cascade)
+  role String
+  content Json
+  createdAt DateTime @default(now())
+  @@index([conversationId,createdAt])
+}

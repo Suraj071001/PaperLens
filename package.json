@@ -1,0 +1,47 @@
+{
+  "name": "paperlens",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n web,api,worker \"npm run dev -w @paperlens/web\" \"npm run dev -w @paperlens/api\" \"npm run dev -w @paperlens/worker\"",
+    "build": "npm run typecheck && npm run build -w @paperlens/web",
+    "typecheck": "tsc --noEmit && npm run typecheck -w @paperlens/web",
+    "lint": "eslint apps packages tests",
+    "test": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:smoke": "tsx --env-file=.env tests/live-smoke.ts",
+    "format": "prettier --write apps packages tests *.json *.ts *.js *.md *.yml",
+    "db:generate": "prisma generate --config packages/db/prisma.config.ts",
+    "db:migrate": "prisma migrate deploy --config packages/db/prisma.config.ts",
+    "db:seed": "tsx --env-file=.env packages/db/seed.ts",
+    "infra:up": "docker compose up -d --wait"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.0",
+    "@types/cors": "^2.8.0",
+    "@types/express": "^5.0.0",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^22.0.0",
+    "@types/pdfkit": "^0.17.0",
+    "@types/pg": "^8.15.0",
+    "@types/supertest": "^6.0.0",
+    "concurrently": "^9.2.0",
+    "dotenv": "^17.0.0",
+    "eslint": "^10.10.0",
+    "prettier": "^3.9.6",
+    "prisma": "^7.0.0",
+    "supertest": "^7.1.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^5.0.0"
+  }
+}

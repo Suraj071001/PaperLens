@@ -1,0 +1,21 @@
+{
+  "name": "@paperlens/api",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file=../../.env src/server.ts",
+    "start": "tsx --env-file=../../.env src/server.ts"
+  },
+  "dependencies": {
+    "@paperlens/ai": "*",
+    "@paperlens/db": "*",
+    "@paperlens/shared": "*",
+    "express": "^5.1.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "helmet": "^8.1.0",
+    "express-rate-limit": "^8.0.0",
+    "multer": "^2.0.0",
+    "pdfkit": "^0.17.0"
+  }
+}
